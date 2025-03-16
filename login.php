@@ -7,7 +7,7 @@
             <h3>Connexion</h3>
             <form method="post" action="traitement_login.php">
                 <div class="form-group">
-                    <label for="email">Adresse e-mail ou Nom d'utilisateur</label>
+                    <label for="email">Adresse e-mail </label>
                     <input type="email" id="email" class="form-control" placeholder="Adresse e-mail ou Nom d'utilisateur*" name="email" required>
                 </div>
                 <div class="form-group">
