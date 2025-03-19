@@ -55,6 +55,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <?php include('nav.php'); ?>
+        <!--Start Page Banner-->
+        <div class="page-banner-area bg-2">
+            <div class="container">
+                <div class="page-banner-content">
+                    <h1>Inscription</h1>
+                    <ul>
+                        <li><a href="index.html">Acceuil</a></li>
+                        <li>Inscription</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--End Page Banner-->
 
 <!-- Start Register Area -->
 <div class="register-area pt-100 pb-70">
