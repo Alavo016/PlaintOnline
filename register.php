@@ -5,6 +5,10 @@ ini_set('display_errors', 1);
 
 // Inclure le fichier de connexion à la base de données
 include "config.php";
+require 'vendor/autoload.php'; // Charger PHPMailer via Composer
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 $alert = ""; // Variable pour stocker l'alerte
 
@@ -24,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Vérifier si les mots de passe correspondent
     if ($confirm_mot_de_passe !== $mot_de_passe) {
-        $alert = '<div class="alert alert-danger" role="alert">Les mots de passe ne correspondent pas. Veuillez réessayer.</div>';
+        $alert = '<div class="alert alert-danger">Les mots de passe ne correspondent pas.</div>';
     } else {
         try {
             // Vérifier si l'email est déjà utilisé
@@ -33,49 +37,68 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $count = $stmt->fetchColumn();
 
             if ($count > 0) {
-                $alert = '<div class="alert alert-danger" role="alert">Cet email est déjà enregistré. Veuillez en choisir un autre.</div>';
+                $alert = '<div class="alert alert-danger">Cet email est déjà utilisé.</div>';
             } else {
                 // Hacher le mot de passe avant l'insertion
                 $mdp_hash = password_hash($mot_de_passe, PASSWORD_DEFAULT);
 
-                // Insérer l'utilisateur dans la base de données
-                $stmt = $pdo->prepare("INSERT INTO plaignant (nom, prenom, email, mot_de_passe) VALUES (?, ?, ?, ?)");
-                if ($stmt->execute([$nom, $prenom, $email, $mdp_hash])) {
-                    header("Location: login.php");
-                    exit;
+                // Générer un code de confirmation à 6 chiffres
+                $confirmation_code = mt_rand(100000, 999999);
+
+                // Insérer l'utilisateur dans la base de données avec un statut "Inactif"
+                $stmt = $pdo->prepare("INSERT INTO plaignant (nom, prenom, email, mot_de_passe, statut, confirmation_code) VALUES (?, ?, ?, ?, ?, ?)");
+                if ($stmt->execute([$nom, $prenom, $email, $mdp_hash, "Inactif", $confirmation_code])) {
+
+                    // Envoi de l'e-mail de confirmation
+                    $mail = new PHPMailer(true);
+                    try {
+                        // Configuration du serveur SMTP
+                        $mail->isSMTP();
+                        $mail->Host       = 'sandbox.smtp.mailtrap.io';
+                        $mail->SMTPAuth   = true;
+                        $mail->Username   = 'bf51506d3a4497';
+                        $mail->Password   = 'a8a5efb8d5d5dc'; // Remplace par ton mot de passe réel
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                        $mail->Port       = 587;
+
+                        // Paramètres de l'e-mail
+                        $mail->setFrom('no-reply@tonsite.com', 'Mon Site');
+                        $mail->addAddress($email, "$prenom $nom");
+                        $mail->Subject = 'Confirmation de votre inscription';
+                        $mail->isHTML(true);
+                        $mail->Body    = "
+                            <h1>Bienvenue $prenom !</h1>
+                            <p>Merci de vous être inscrit. Voici votre code de confirmation :</p>
+                            <h2 style='color:blue;'>$confirmation_code</h2>
+                            <p>Veuillez entrer ce code sur la page de confirmation pour activer votre compte.</p>
+                        ";
+
+                        $mail->send();
+
+                        // Redirection vers la page de confirmation
+                        header("Location: confirmation.php?email=" . urlencode($email));
+                        exit;
+                    } catch (Exception $e) {
+                        $alert = '<div class="alert alert-danger">Erreur lors de l\'envoi de l\'e-mail : ' . $mail->ErrorInfo . '</div>';
+                    }
                 } else {
-                    $alert = '<div class="alert alert-danger" role="alert">Erreur lors de l\'insertion.</div>';
+                    $alert = '<div class="alert alert-danger">Erreur lors de l\'inscription.</div>';
                 }
             }
         } catch (PDOException $e) {
-            $alert = '<div class="alert alert-danger" role="alert">Erreur PDO : ' . $e->getMessage() . '</div>';
+            $alert = '<div class="alert alert-danger">Erreur PDO : ' . $e->getMessage() . '</div>';
         }
     }
 }
 ?>
 
 <?php include('nav.php'); ?>
-        <!--Start Page Banner-->
-        <div class="page-banner-area bg-2">
-            <div class="container">
-                <div class="page-banner-content">
-                    <h1>Inscription</h1>
-                    <ul>
-                        <li><a href="index.html">Acceuil</a></li>
-                        <li>Inscription</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <!--End Page Banner-->
-
-<!-- Start Register Area -->
 <div class="register-area pt-100 pb-70">
     <div class="container">
         <div class="register">
             <h3>Inscription</h3>
 
-            <!-- Affichage des alertes ici après la bannière -->
+            <!-- Affichage des alertes ici -->
             <?php echo $alert; ?>
 
             <form method="post" action="">
@@ -85,12 +108,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <input type="email" id="email" class="form-control" placeholder="Email*" name="email" required>
                         </div>
                     </div>
-                    <div class="col-lg-6 col-md-6">
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <input type="text" id="name" class="form-control" placeholder="Nom*" name="nom" required>
                         </div>
                     </div>
-                    <div class="col-lg-6 col-md-6">
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <input type="text" id="lname" class="form-control" placeholder="Prénom*" name="prenom" required>
                         </div>
@@ -111,6 +134,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </div>
-<!-- End Register Area -->
-
 <?php include('footer.php'); ?>
