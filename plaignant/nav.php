@@ -1,4 +1,3 @@
-
 <div class="section-content-right">
     <!-- header-dashboard -->
     <div class="header-dashboard">
@@ -83,3 +82,6 @@
         </div>
     </div>
     <!-- /header-dashboard -->
+    <div class="main-content">
+        <div class="main-content-inner">
+            <div class="main-content-wrap">

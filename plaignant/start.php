@@ -36,39 +36,92 @@
     <link rel="shortcut icon" href="images/favicon.png">
     <link rel="apple-touch-icon-precomposed" href="images/favicon.png">
     <style>
-    /* Augmenter la taille de la table sur PC */
-    .table-container {
-        max-width: 90%;
-        margin: auto;
-    }
-    
-    table {
-        font-size: 1.1rem; /* Texte plus grand */
-    }
-
-    th, td {
-        padding: 10px !important;
-    }
-
-    /* Agrandir les boutons */
-
-
-    /* Assurer une bonne responsivité */
-    @media (max-width: 768px) {
+        /* Augmenter la taille de la table sur PC */
         .table-container {
-            max-width: 100%;
+            max-width: 90%;
+            margin: auto;
         }
-        
+
         table {
-            font-size: 0.9rem;
+            font-size: 1.1rem;
+            /* Texte plus grand */
         }
-        
-        .btn {
-            font-size: 0.8rem;
-            padding: 8px 10px;
+
+        th,
+        td {
+            padding: 10px !important;
         }
-    }
-</style>
+
+        /* Agrandir les boutons */
+
+
+        /* Assurer une bonne responsivité */
+        @media (max-width: 768px) {
+            .table-container {
+                max-width: 100%;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                font-size: 0.8rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .uploadfile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 150px;
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+
+        .uploadfile:hover {
+            background-color: #e9ecef;
+        }
+
+        .uploadfile .icon {
+            font-size: 40px;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .uploadfile input[type="file"] {
+            display: none;
+        }
+
+        .upload-preview {
+            display: flex;
+            margin-top: 10px;
+            gap: 10px;
+        }
+
+        .upload-preview img {
+            max-width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            object-fit: cover;
+            border: 1px solid #ccc;
+        }
+
+        .upload-preview .file-info {
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+        }
+    </style>
+
 </head>
 
 <body class="body">
@@ -79,4 +132,3 @@
         <div id="page" class="">
             <!-- layout-wrap -->
             <div class="layout-wrap">
-              
